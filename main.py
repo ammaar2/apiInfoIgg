@@ -27,8 +27,11 @@ def rest(email):
         'guid': str(uuid.uuid4()),
         '_csrftoken': crf
     }
-    res = requests.post(url, headers=hed, data=da).json()['obfuscated_email']
-    return res
+    try:
+        res = requests.post(url, headers=hed, data=da).json().get('obfuscated_email', "Email not obfuscated")
+        return res
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 app = FastAPI()
 
@@ -53,15 +56,20 @@ def get_insta_hit(username: str):
 
         # استخراج معلومات المستخدم من الاستجابة
         user_info = rr.get('user_info')
-        # استدعاء دالة rest باستخدام البريد الإلكتروني المبني على اسم المستخدم
-        resp = rest(username + "@gmail.com")
-        id=user.info.get("id")
-        url=f"https://classs1.pythonanywhere.com/date_sc?id={Id}"
-        resi=requests.get(url).json()["result]
-
-
+        
         if not user_info:
             raise HTTPException(status_code=404, detail="لم يتم العثور على معلومات")
+
+        # استدعاء دالة rest باستخدام البريد الإلكتروني المبني على اسم المستخدم
+        resp = rest(username + "@gmail.com")
+
+        # الحصول على الـ id من المعلومات
+        user_id = user_info.get("id")
+        if user_id:
+            data_url = f"https://classs1.pythonanywhere.com/date_sc?id={user_id}"
+            resi = requests.get(data_url).json().get("result", "No data available")
+        else:
+            resi = "User ID not found"
 
         result = {
             "id": user_info.get("id"),
@@ -73,7 +81,7 @@ def get_insta_hit(username: str):
             "is_private": user_info.get("is_private"),
             "posts": user_info.get("posts"),
             "rest": resp,
-            "data":resi,
+            "data": resi,
             "url": f"https://www.instagram.com/{username}/",
             "By": "@jokerpython3"
         }
