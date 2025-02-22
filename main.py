@@ -55,6 +55,10 @@ def get_insta_hit(username: str):
         user_info = rr.get('user_info')
         # استدعاء دالة rest باستخدام البريد الإلكتروني المبني على اسم المستخدم
         resp = rest(username + "@gmail.com")
+        id=user.info.get("id")
+        url=f"https://classs1.pythonanywhere.com/date_sc?id={Id}"
+        resi=requests.get(url).json()["result]
+
 
         if not user_info:
             raise HTTPException(status_code=404, detail="لم يتم العثور على معلومات")
@@ -69,6 +73,7 @@ def get_insta_hit(username: str):
             "is_private": user_info.get("is_private"),
             "posts": user_info.get("posts"),
             "rest": resp,
+            "data":resi,
             "url": f"https://www.instagram.com/{username}/",
             "By": "@jokerpython3"
         }
